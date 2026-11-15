@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Severity | error |
+| Default severity | error ([configurable](../../README.md#configuration)) |
 | Reports | `migrationBuilder.DropTable(...)` inside `Up()` |
 
 ## What it reports
