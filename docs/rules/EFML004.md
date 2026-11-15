@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Severity | warning (advisory, doesn't fail the run unless `--warnings-as-errors` is used) |
+| Default severity | warning (advisory, doesn't fail the run unless `--warnings-as-errors` is used; [configurable](../../README.md#configuration)) |
 | Reports | `migrationBuilder.Sql(...)` inside `Up()` |
 
 ## What it reports

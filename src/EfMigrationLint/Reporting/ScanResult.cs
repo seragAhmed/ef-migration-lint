@@ -1,4 +1,5 @@
 using EfMigrationLint.Analysis;
+using EfMigrationLint.Configuration;
 
 namespace EfMigrationLint.Reporting;
 
@@ -8,12 +9,18 @@ public sealed record ScanError(string? Path, string Message);
 /// <summary>Everything a reporter needs to print.</summary>
 public sealed class ScanResult
 {
-    public ScanResult(IReadOnlyList<FileAnalysis> files, IReadOnlyList<string> skipped, IReadOnlyList<ScanError> errors, IReadOnlyList<Finding> findings)
+    public ScanResult(
+        IReadOnlyList<FileAnalysis> files,
+        IReadOnlyList<string> skipped,
+        IReadOnlyList<ScanError> errors,
+        IReadOnlyList<Finding> findings,
+        LintConfig? config = null)
     {
         Files = files;
         Skipped = skipped;
         Errors = errors;
         Findings = findings;
+        Config = config;
     }
 
     public IReadOnlyList<FileAnalysis> Files { get; }
@@ -23,6 +30,9 @@ public sealed class ScanResult
     public IReadOnlyList<ScanError> Errors { get; }
 
     public IReadOnlyList<Finding> Findings { get; }
+
+    /// <summary>The config file that was applied, if any.</summary>
+    public LintConfig? Config { get; }
 
     public int ErrorCount => Findings.Count(f => f.Severity == Severity.Error);
 

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Severity | error |
+| Default severity | error ([configurable](../../README.md#configuration)) |
 | Reports | `migrationBuilder.DropColumn(...)` inside `Up()` |
 
 ## What it reports

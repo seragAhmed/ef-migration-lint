@@ -143,7 +143,8 @@ Add a realistic scaffolded migration under `samples/`, for example
 
 - IDs are `EFML` plus three digits, assigned in order.
 - An ID is never renumbered or reused, even if the rule is removed.
-- Changing a rule's severity is a breaking change and needs a changelog entry.
+- Changing a rule's default severity is a breaking change and needs a changelog entry. Users can
+  still set any rule's severity in `ef-migration-lint.json`.
 
 ## Pull requests
 

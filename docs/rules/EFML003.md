@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Severity | warning (advisory, doesn't fail the run unless `--warnings-as-errors` is used) |
+| Default severity | warning (advisory, doesn't fail the run unless `--warnings-as-errors` is used; [configurable](../../README.md#configuration)) |
 | Reports | `migrationBuilder.AddColumn<T>(...)` inside `Up()` that is non-nullable and has no `defaultValue`, `defaultValueSql`, or `computedColumnSql` |
 
 ## What it reports

@@ -32,6 +32,11 @@ public static class ConsoleReporter
 
     public static void WriteSummary(TextWriter output, ScanResult result)
     {
+        if (result.Config is not null)
+        {
+            output.WriteLine(result.Config.Describe());
+        }
+
         var migrations = result.Files.Sum(f => f.MigrationCount);
         var withoutMigrations = result.Files.Count(f => f.Error is null && f.MigrationCount == 0);
 

@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+
+- Per-rule severity in `ef-migration-lint.json` (or the file given with `--config <file>`): set any
+  rule to `"error"`, `"warning"`, or `"off"`. An invalid config file exits with code 2. The run
+  summary names the config file and its settings, and `--list-rules` shows each rule's effective
+  severity.
+
 ## [0.1.0] - 2026-11-15
 
 ### Added

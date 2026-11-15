@@ -107,8 +107,11 @@ ef-migration-lint [options] <path>...
 
   <path>                     A migration .cs file or a directory to scan recursively.
   --format <console|github>  console (default) or GitHub Actions annotations.
+  --config <file>            Per-rule settings. Default: ef-migration-lint.json in the current
+                             directory, if it exists. See Configuration below.
   --warnings-as-errors       Make warnings fail the run (exit code 1). Off by default.
-  --list-rules               Print the rules.
+                             Applied after the config.
+  --list-rules               Print the rules with their severity after the config.
   --version, --help
 ```
 
@@ -116,7 +119,7 @@ ef-migration-lint [options] <path>...
 |---|---|
 | `0` | Analysis completed with no errors. Warnings, if any, are advisory. |
 | `1` | Analysis completed and found at least one error (or a warning with `--warnings-as-errors`). |
-| `2` | Scanning could not complete: bad arguments, a missing or unreadable path, a non-`.cs` file, or a file with C# syntax errors (for example, unresolved merge conflict markers). Takes precedence over `1`. |
+| `2` | Scanning could not complete: bad arguments, an invalid config file, a missing or unreadable path, a non-`.cs` file, or a file with C# syntax errors (for example, unresolved merge conflict markers). Takes precedence over `1`. |
 
 Each finding includes the rule ID, severity, file path, line and column, a description, a suggested
 review action, and a link to the rule's documentation.
@@ -163,9 +166,50 @@ If your migrations aren't in a folder named `Migrations`, change the path patter
 
 Rule IDs are stable. They are never renumbered or reused.
 
+The severity column is the default. You can change it per rule; see [Configuration](#configuration).
+
 EFML003 is a prompt for review, not a prediction. Whether adding the column fails depends on your
 provider, the column type, and whether the table has rows. EFML004 does not try to understand the
 SQL. It asks a person to read it.
+
+## Configuration
+
+Each rule's severity can be changed, or the rule turned off, in `ef-migration-lint.json`:
+
+```jsonc
+{
+  "rules": {
+    // A multi-tenant app: an unreviewed raw SQL statement runs against every tenant database.
+    "EFML004": "error",
+    // Our migrations always set defaults in a later step, so this one is noise for us.
+    "EFML003": "off"
+  }
+}
+```
+
+| Setting | Effect |
+|---|---|
+| `"error"` | Findings fail the run (exit code 1). |
+| `"warning"` | Findings are reported but don't fail the run, unless `--warnings-as-errors` is given. |
+| `"off"` | The rule doesn't run. |
+
+- The tool reads `ef-migration-lint.json` from the **current directory** if it exists. Pass
+  `--config <file>` to use a different file. It doesn't search parent directories.
+- Rules you don't list keep their default severity. Comments and trailing commas are allowed.
+- A mistake in the file (an unknown rule ID, a misspelled setting, invalid JSON) stops the run with
+  exit code 2, so a typo can never quietly turn a rule off.
+- `--warnings-as-errors` applies after the config: it turns every remaining warning into an error.
+- Every run that uses a config prints it in the summary, so CI logs show what was changed:
+
+  ```text
+  Config: ef-migration-lint.json (EFML003 off, EFML004 error).
+  ```
+
+- `ef-migration-lint --list-rules` prints each rule's effective severity.
+
+The config file is part of your repository, so a pull request can change it like any other file.
+Review changes to it the way you review the workflow itself. A `CODEOWNERS` entry for
+`ef-migration-lint.json` makes that review required.
 
 ## What gets scanned
 
@@ -204,8 +248,7 @@ This project's focus is a small, source-only check that fits the PR review loop.
   Markdown job summary (`$GITHUB_STEP_SUMMARY`).
 - **More rules**: `RenameColumn`/`RenameTable` (they break app versions still running during a rolling
   deploy), `AlterColumn` changes from nullable to non-nullable, and `DropSchema`/`DropSequence`.
-- **Integrations**: SARIF output for code scanning, a reusable composite action, and an optional
-  config file for per-rule severity.
+- **Integrations**: SARIF output for code scanning and a reusable composite action.
 
 Ideas and votes are welcome in [issues](https://github.com/seragAhmed/ef-migration-lint/issues).
 
