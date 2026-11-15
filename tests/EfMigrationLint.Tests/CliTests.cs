@@ -145,7 +145,7 @@ public class CliTests
 
         var (exitCode, stdout, _) = Run("--version");
         Assert.Equal(ExitCodes.Success, exitCode);
-        Assert.Equal("0.1.0", stdout.Trim());
+        Assert.Equal("0.2.0", stdout.Trim());
 
         var rules = Run("--list-rules");
         Assert.Equal(ExitCodes.Success, rules.ExitCode);

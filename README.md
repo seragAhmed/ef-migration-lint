@@ -118,7 +118,7 @@ To try unreleased changes from `main` on your own project, install the tool from
 
 ```bash
 dotnet pack src/EfMigrationLint -c Release -o artifacts
-dotnet tool install --global EfMigrationLint --add-source ./artifacts --version 0.1.0
+dotnet tool install --global EfMigrationLint --add-source ./artifacts --version 0.2.0
 
 ef-migration-lint path/to/YourProject/Migrations
 ```
@@ -199,8 +199,7 @@ SQL. It asks a person to read it.
 
 ## Configuration
 
-> Not released yet: this is on `main` and ships in the next release. The 0.1.0 package on NuGet.org
-> doesn't read a config file or accept `--config`.
+> Added in 0.2.0. Version 0.1.0 doesn't read a config file or accept `--config`.
 
 Each rule's severity can be changed, or the rule turned off, in `ef-migration-lint.json`:
 
@@ -272,8 +271,8 @@ This project's focus is a small, source-only check that fits the PR review loop.
 
 ## Roadmap
 
-- **v0.2**: per-rule severity config (done on `main`). Add an inline suppression comment that requires
-  a reason. Write a Markdown job summary (`$GITHUB_STEP_SUMMARY`).
+- **Next**: an inline suppression comment that requires a reason, and a Markdown job summary
+  (`$GITHUB_STEP_SUMMARY`).
 - **More rules**: `RenameColumn`/`RenameTable` (they break app versions still running during a rolling
   deploy), `AlterColumn` changes from nullable to non-nullable, and `DropSchema`/`DropSequence`.
 - **Integrations**: SARIF output for code scanning and a reusable composite action.

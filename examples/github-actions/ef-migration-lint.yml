@@ -34,7 +34,7 @@ jobs:
         # Pinned, so a new release never changes your check without a PR. If you use a local tool
         # manifest (dotnet-tools.json), run `dotnet tool restore` here instead and call
         # `dotnet tool run ef-migration-lint` in the next step.
-        run: dotnet tool install --global EfMigrationLint --version 0.1.0
+        run: dotnet tool install --global EfMigrationLint --version 0.2.0
 
       - name: Lint added or modified migrations
         shell: bash

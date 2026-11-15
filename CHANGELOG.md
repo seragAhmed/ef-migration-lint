@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-15
+
 ### Added
 
 - Per-rule severity in `ef-migration-lint.json` (or the file given with `--config <file>`): set any

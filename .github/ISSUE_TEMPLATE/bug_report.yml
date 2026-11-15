@@ -12,7 +12,7 @@ body:
     attributes:
       label: Version
       description: Output of `ef-migration-lint --version`, or a commit SHA if built from source.
-      placeholder: "0.1.0"
+      placeholder: "0.2.0"
     validations:
       required: true
   - type: input
