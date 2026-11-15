@@ -8,7 +8,21 @@ contributions include:
 - a provider-specific example (SQL Server, PostgreSQL, SQLite, MySQL) in `docs/rules/`.
 
 Issues labelled [`good first issue`](https://github.com/seragAhmed/ef-migration-lint/labels/good%20first%20issue)
-have concrete acceptance criteria. Comment on one before you start so two people don't pick the same issue.
+have concrete acceptance criteria.
+
+## Before you start: get the issue assigned
+
+1. Find an issue you'd like to work on, or open one for your idea.
+2. Comment on it to say you'd like to take it.
+3. **Wait until a maintainer assigns the issue to you**, then start. This keeps two people from
+   working on the same thing and lets us agree on the approach first.
+4. In your pull request description, link the issue with `Closes #<number>`.
+
+A check on every pull request confirms that the linked issue is assigned to the PR author. If you
+were assigned after opening the PR, re-run the check or push a new commit.
+
+Questions and ideas that aren't ready to be an issue are welcome in
+[Discussions](https://github.com/seragAhmed/ef-migration-lint/discussions).
 
 ## Setup
 
@@ -148,7 +162,7 @@ Add a realistic scaffolded migration under `samples/`, for example
 
 ## Pull requests
 
-- One change per PR. Include tests.
+- One change per PR, for an issue assigned to you. Include tests.
 - Run `dotnet test` before pushing. CI builds, tests, packs, and runs the packed tool against
   `samples/` on Linux and Windows.
 - The build treats warnings as errors.
