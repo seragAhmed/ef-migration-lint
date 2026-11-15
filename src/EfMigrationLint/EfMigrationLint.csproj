@@ -13,7 +13,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>ef-migration-lint</ToolCommandName>
     <PackageId>EfMigrationLint</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>EF Migration Lint contributors</Authors>
     <Description>Source-only checks for potentially destructive EF Core migration operations. Reads migration .cs files with Roslyn; never builds your project or connects to a database. Prints readable console output or GitHub Actions annotations.</Description>
     <PackageTags>efcore;entity-framework;migrations;lint;roslyn;github-actions;ci</PackageTags>

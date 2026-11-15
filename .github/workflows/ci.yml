@@ -51,7 +51,8 @@ jobs:
       - name: Install the packed tool and run it against samples
         shell: bash
         run: |
-          dotnet tool install --tool-path .tools EfMigrationLint --add-source artifacts --version 0.1.0
+          version=$(dotnet msbuild src/EfMigrationLint -getProperty:Version)
+          dotnet tool install --tool-path .tools EfMigrationLint --add-source artifacts --version "$version"
           bash scripts/smoke-test.sh .tools/ef-migration-lint
 
       - name: Run the net8.0 build on the .NET 8 runtime
