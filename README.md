@@ -1,6 +1,7 @@
 # EF Migration Lint
 
 [![CI](https://github.com/seragAhmed/ef-migration-lint/actions/workflows/ci.yml/badge.svg)](https://github.com/seragAhmed/ef-migration-lint/actions/workflows/ci.yml)
+[![NuGet](https://img.shields.io/nuget/v/EfMigrationLint.svg)](https://www.nuget.org/packages/EfMigrationLint)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Catch potentially destructive EF Core migration operations during pull request review.
@@ -72,6 +73,30 @@ Result: passed (no findings). Exit code 0.
 
 Both versions are in [`samples/`](samples), so you can reproduce this yourself.
 
+## Install
+
+`ef-migration-lint` is a .NET tool on [NuGet.org](https://www.nuget.org/packages/EfMigrationLint). It
+runs on the .NET 8 runtime or newer, whatever your application targets.
+
+```bash
+dotnet tool install --global EfMigrationLint
+
+ef-migration-lint path/to/YourProject/Migrations
+```
+
+To pin the version for your whole team, install it as a local tool in your repository instead. The
+version is recorded in the tool manifest (`dotnet-tools.json`, or `.config/dotnet-tools.json` with
+older SDKs), and `dotnet tool restore` installs it on another machine or in CI:
+
+```bash
+dotnet new tool-manifest   # once per repository
+dotnet tool install EfMigrationLint
+
+dotnet tool run ef-migration-lint path/to/YourProject/Migrations
+```
+
+Update with `dotnet tool update --global EfMigrationLint` (or without `--global` for a local tool).
+
 ## Quickstart (from a fresh clone)
 
 You need the [.NET 10 SDK](https://dotnet.microsoft.com/download) or newer to build. The installed tool
@@ -89,7 +114,7 @@ dotnet run --project src/EfMigrationLint -f net10.0 -- samples/Destructive/Migra
 dotnet run --project src/EfMigrationLint -f net10.0 -- samples/Safe/Migrations/20260111090000_RenameBioToBiography.cs
 ```
 
-To use it on your own project, install it as a .NET tool from a local package:
+To try unreleased changes from `main` on your own project, install the tool from a local package:
 
 ```bash
 dotnet pack src/EfMigrationLint -c Release -o artifacts
@@ -98,7 +123,7 @@ dotnet tool install --global EfMigrationLint --add-source ./artifacts --version 
 ef-migration-lint path/to/YourProject/Migrations
 ```
 
-The package is not on NuGet.org yet. Once it is, `dotnet tool install --global EfMigrationLint` will be enough.
+If an earlier version is installed, run `dotnet tool uninstall --global EfMigrationLint` first.
 
 ## Usage
 
@@ -174,6 +199,9 @@ SQL. It asks a person to read it.
 
 ## Configuration
 
+> Not released yet: this is on `main` and ships in the next release. The 0.1.0 package on NuGet.org
+> doesn't read a config file or accept `--config`.
+
 Each rule's severity can be changed, or the rule turned off, in `ef-migration-lint.json`:
 
 ```jsonc
@@ -244,8 +272,8 @@ This project's focus is a small, source-only check that fits the PR review loop.
 
 ## Roadmap
 
-- **v0.2**: publish to NuGet.org. Add an inline suppression comment that requires a reason. Write a
-  Markdown job summary (`$GITHUB_STEP_SUMMARY`).
+- **v0.2**: per-rule severity config (done on `main`). Add an inline suppression comment that requires
+  a reason. Write a Markdown job summary (`$GITHUB_STEP_SUMMARY`).
 - **More rules**: `RenameColumn`/`RenameTable` (they break app versions still running during a rolling
   deploy), `AlterColumn` changes from nullable to non-nullable, and `DropSchema`/`DropSequence`.
 - **Integrations**: SARIF output for code scanning and a reusable composite action.
