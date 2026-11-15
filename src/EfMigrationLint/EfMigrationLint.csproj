@@ -7,6 +7,8 @@
     <RollForward>Major</RollForward>
     <RootNamespace>EfMigrationLint</RootNamespace>
     <AssemblyName>ef-migration-lint</AssemblyName>
+    <!-- Ship only English Roslyn resources; translated satellite assemblies are most of the package size. -->
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>ef-migration-lint</ToolCommandName>
