@@ -1,0 +1,54 @@
+name: Bug report
+description: Wrong output, a crash, a false positive, or a missed operation.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. False positives and false negatives are both bugs.
+        Please remove anything confidential (table names, connection strings) from snippets.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `ef-migration-lint --version`, or a commit SHA if built from source.
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: command
+    attributes:
+      label: Command
+      description: The exact command you ran.
+      placeholder: "ef-migration-lint --format github src/App/Migrations"
+    validations:
+      required: true
+  - type: textarea
+    id: migration
+    attributes:
+      label: Migration source
+      description: The smallest migration snippet that reproduces the problem.
+      render: csharp
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+      description: Which findings and exit code you expected.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+      description: The full output and exit code.
+      render: text
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, .NET SDK version, and local or GitHub Actions.
+      placeholder: "ubuntu-latest, .NET 8.0.404, GitHub Actions"

@@ -1,0 +1,63 @@
+name: Rule proposal
+description: Suggest a new rule or a change to an existing rule.
+labels: ["rule"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A good rule is precise from source code alone and has a clear review action.
+        See "How to add a rule" in CONTRIBUTING.md.
+  - type: input
+    id: operation
+    attributes:
+      label: MigrationBuilder operation
+      description: The method this rule would inspect, or the existing rule ID to change.
+      placeholder: "migrationBuilder.RenameColumn(...)"
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Proposed severity
+      description: Errors are for operations that delete data. Anything that only might be a problem is a warning.
+      options:
+        - warning
+        - error
+    validations:
+      required: true
+  - type: textarea
+    id: risk
+    attributes:
+      label: Why is it risky?
+      description: What goes wrong in production, and on which providers?
+    validations:
+      required: true
+  - type: textarea
+    id: flagged
+    attributes:
+      label: Should be reported
+      description: One or more migration snippets the rule must report.
+      render: csharp
+    validations:
+      required: true
+  - type: textarea
+    id: not-flagged
+    attributes:
+      label: Should NOT be reported
+      description: Similar snippets the rule must stay silent on. This keeps false positives down.
+      render: csharp
+    validations:
+      required: true
+  - type: textarea
+    id: action
+    attributes:
+      label: Suggested review action
+      description: What should the message tell the reviewer to check or change?
+    validations:
+      required: true
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contribution
+      options:
+        - label: I'd like to implement this rule myself.

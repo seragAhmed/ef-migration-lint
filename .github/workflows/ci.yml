@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Read-only token; no secrets are used, so fork PRs run the same checks.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build, test, pack (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # SDK 10 builds both target frameworks; the 8.0 runtime lets us run the net8.0 build too.
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test --configuration Release --no-build
+
+      - name: Pack
+        run: dotnet pack src/EfMigrationLint --configuration Release --no-build --output artifacts
+
+      - name: Install the packed tool and run it against samples
+        shell: bash
+        run: |
+          dotnet tool install --tool-path .tools EfMigrationLint --add-source artifacts --version 0.1.0
+          bash scripts/smoke-test.sh .tools/ef-migration-lint
+
+      - name: Run the net8.0 build on the .NET 8 runtime
+        shell: bash
+        run: bash scripts/smoke-test.sh dotnet src/EfMigrationLint/bin/Release/net8.0/ef-migration-lint.dll
+
+      - name: Upload package
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v7
+        with:
+          name: nupkg
+          path: artifacts/*.nupkg
+          if-no-files-found: error
