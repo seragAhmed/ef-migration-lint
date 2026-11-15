@@ -1,0 +1,60 @@
+name: Issue assignment
+
+# Contributors start work after a maintainer assigns them the issue (see CONTRIBUTING.md).
+# This check fails a pull request that doesn't close an issue assigned to its author.
+# It only reads public data with the default token and runs no code from the PR,
+# so it is safe on fork PRs.
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  assigned:
+    name: Linked issue is assigned to the author
+    # Maintainers and bots don't need an assigned issue.
+    if: >-
+      github.event.pull_request.user.type != 'Bot' &&
+      !contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.pull_request.author_association)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the issues this PR closes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          NUMBER: ${{ github.event.pull_request.number }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: |
+          # closingIssuesReferences covers "Closes #N" (and Fixes/Resolves) in the description
+          # and issues linked from the PR sidebar.
+          issues=$(gh api graphql \
+            -f query='query($owner: String!, $repo: String!, $number: Int!) {
+              repository(owner: $owner, name: $repo) {
+                pullRequest(number: $number) {
+                  closingIssuesReferences(first: 10) {
+                    nodes { number assignees(first: 10) { nodes { login } } }
+                  }
+                }
+              }
+            }' \
+            -f owner="$OWNER" -f repo="$REPO" -F number="$NUMBER" \
+            --jq '.data.repository.pullRequest.closingIssuesReferences.nodes')
+
+          if [ "$(jq 'length' <<<"$issues")" -eq 0 ]; then
+            echo "::error title=No linked issue::Add 'Closes #<number>' to the PR description for the issue you were assigned. Comment on the issue first and wait until a maintainer assigns it to you. See CONTRIBUTING.md."
+            exit 1
+          fi
+
+          if jq -e --arg author "$AUTHOR" 'any(.[]; any(.assignees.nodes[]; .login == $author))' <<<"$issues" >/dev/null; then
+            echo "A linked issue is assigned to $AUTHOR."
+            exit 0
+          fi
+
+          numbers=$(jq -r '[.[] | "#\(.number)"] | join(", ")' <<<"$issues")
+          echo "::error title=Issue not assigned::$numbers is not assigned to $AUTHOR. Comment on the issue and wait until a maintainer assigns it to you, then re-run this check or push a new commit. See CONTRIBUTING.md."
+          exit 1
