@@ -1,0 +1,74 @@
+name: Release
+
+# Publishes to NuGet.org with trusted publishing (GitHub OIDC): no API key is stored in the repo.
+# Runs when a GitHub release is published, or manually for an existing release tag.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing release tag to publish, for example v0.1.0'
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Build and publish to NuGet
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # attach the package to the GitHub release
+      id-token: write # exchange the GitHub OIDC token for a short-lived NuGet API key
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Check that the tag matches the package version
+        run: |
+          version=$(dotnet msbuild src/EfMigrationLint -getProperty:Version)
+          if [ "v$version" != "$TAG" ]; then
+            echo "::error::Tag $TAG does not match package version $version in EfMigrationLint.csproj."
+            exit 1
+          fi
+
+      - name: Test
+        run: dotnet test --configuration Release
+
+      - name: Pack
+        run: dotnet pack src/EfMigrationLint --configuration Release --output artifacts
+
+      - name: Log in to NuGet (trusted publishing)
+        id: nuget
+        uses: NuGet/login@v1
+        with:
+          user: SeragAhmed1 # nuget.org account that owns the package
+
+      - name: Push to NuGet.org
+        run: >
+          dotnet nuget push artifacts/*.nupkg
+          --api-key "${{ steps.nuget.outputs.NUGET_API_KEY }}"
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
+
+      - name: Attach the package to the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$TAG" artifacts/*.nupkg --clobber --repo "$GITHUB_REPOSITORY"
