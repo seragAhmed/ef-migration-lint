@@ -153,6 +153,14 @@ Add a realistic scaffolded migration under `samples/`, for example
 - The build treats warnings as errors.
 - If you used an AI assistant, that's fine. Please review and understand every line you submit.
 
+## Releasing (maintainers)
+
+1. In a PR, bump `<Version>` in `src/EfMigrationLint/EfMigrationLint.csproj` and move the
+   *Unreleased* notes in `CHANGELOG.md` under the new version.
+2. After it merges, create a GitHub release with a matching tag: `gh release create v0.2.0 --generate-notes`.
+3. The `Release` workflow tests and packs that tag, publishes it to NuGet.org with trusted publishing
+   (no stored API key), and attaches the `.nupkg` to the release. It fails if the tag and `<Version>` differ.
+
 ## Reporting bugs and false positives
 
 Use the **Bug report** template and include the smallest migration snippet that reproduces the
